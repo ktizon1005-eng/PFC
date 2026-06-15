@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>減量プラン シミュレーター | MOGU LAB</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", "Hiragino Sans", serif;
+    background: #FBF3F0;
+    color: #3A2E2C;
+  }
+  .page {
+    min-height: 100vh;
+    padding: 28px 16px 60px;
+  }
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #EBD9D3;
+  }
+  .topbar-label {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: #C2A29B;
+    text-transform: uppercase;
+  }
+  .logo {
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.4em;
+    color: #B8836F;
+    padding: 0;
+  }
+  .header {
+    margin-bottom: 56px;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.36em;
+    color: #C9836A;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #EBD9D3;
+    max-width: 120px;
+  }
+  h1 {
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    font-size: 52px;
+    font-weight: 500;
+    margin: 0 0 20px 0;
+    letter-spacing: 0.08em;
+    line-height: 1.5;
+    color: #3A2E2C;
+  }
+  .subtitle {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 13px;
+    color: #A78E89;
+    line-height: 2;
+    margin: 0;
+    max-width: 480px;
+    letter-spacing: 0.04em;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.5fr);
+    gap: 24px;
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    h1 {
+      font-size: 28px;
+    }
+  }
+  .card {
+    background: #FFFFFF;
+    border-radius: 2px;
+    padding: 40px;
+    border: 1px solid #EBD9D3;
+  }
+  .card-title {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #C9836A;
+    margin: 0 0 28px 0;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #EBD9D3;
+    padding-bottom: 18px;
+  }
+  .field-row {
+    margin-bottom: 18px;
+  }
+  label {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #A78E89;
+    margin-bottom: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #EBD9D3;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #FDF8F6;
+    transition: border-color 0.15s;
+  }
+  .input-wrap:focus-within {
+    border-color: #C9836A;
+  }
+  input[type="number"] {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 14px;
+    font-size: 16px;
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-weight: 600;
+    color: #3A2E2C;
+    outline: none;
+    width: 100%;
+  }
+  .unit {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    padding: 0 14px;
+    font-size: 12px;
+    color: #C9836A;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  select {
+    width: 100%;
+    border: 1px solid #EBD9D3;
+    border-radius: 2px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-weight: 500;
+    background: #FDF8F6;
+    color: #3A2E2C;
+  }
+  select:focus {
+    outline: none;
+    border-color: #C9836A;
+  }
+  .segmented {
+    display: flex;
+    border: 1px solid #EBD9D3;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .segment-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background: #FDF8F6;
+    color: #A78E89;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    letter-spacing: 0.1em;
+    transition: background 0.15s, color 0.15s;
+  }
+  .segment-btn.active {
+    background: #C9836A;
+    color: #FFFFFF;
+  }
+  .stats-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .stat-box {
+    flex: 1;
+    background: #FDF8F6;
+    border-radius: 2px;
+    padding: 18px 20px;
+    border: 1px solid #EBD9D3;
+  }
+  .stat-label {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 10px;
+    color: #A78E89;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .stat-value {
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    color: #3A2E2C;
+  }
+  .stat-unit {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #C9836A;
+  }
+  .level-badge {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    display: inline-block;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    letter-spacing: 0.18em;
+  }
+  .level-desc {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 13px;
+    color: #A78E89;
+    line-height: 1.8;
+    margin: 0 0 20px 0;
+  }
+  .divider {
+    height: 1px;
+    background: #EBD9D3;
+    margin: 28px 0;
+  }
+  .big-stat {
+    background: #FDF8F6;
+    border-radius: 2px;
+    padding: 28px 28px;
+    border: 1px solid #EBD9D3;
+    border-left: 3px solid #C9836A;
+  }
+  .big-stat-label {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #A78E89;
+    margin: 0 0 10px 0;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+  .big-stat-value {
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    font-size: 46px;
+    font-weight: 600;
+    color: #C9836A;
+    margin: 0 0 12px 0;
+    line-height: 1;
+  }
+  .big-stat-sub {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 13px;
+    color: #A78E89;
+    line-height: 1.8;
+    margin: 0;
+  }
+  .exercise-intro {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 13px;
+    color: #A78E89;
+    line-height: 1.8;
+    margin: 0 0 16px 0;
+  }
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 480px) {
+    .exercise-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .exercise-box {
+    background: #FDF8F6;
+    border-radius: 2px;
+    padding: 18px 12px;
+    text-align: center;
+    border: 1px solid #EBD9D3;
+    transition: border-color 0.15s;
+  }
+  .exercise-box:hover {
+    border-color: #C9836A;
+  }
+  .exercise-label {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 11px;
+    color: #A78E89;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .exercise-value {
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #3A2E2C;
+    margin: 0;
+  }
+  .exercise-note {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 11px;
+    color: #CBB5B0;
+    line-height: 1.8;
+    margin: 0;
+  }
+  .footer {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    margin-top: 32px;
+    font-size: 11px;
+    color: #CBB5B0;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="topbar">
+      <span class="topbar-label">Personal Diet Planning</span>
+      <span class="logo">MOGU LAB</span>
+    </div>
+
+    <header class="header">
+      <p class="eyebrow">Diet Plan Simulator</p>
+      <h1>その目標、<br>どう進みますか？</h1>
+      <p class="subtitle">
+        体重・期間を入力すると、必要なカロリー設定と、食事だけに頼らず運動で補う場合の目安をお伝えします。
+      </p>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="card-title">Your Data</h2>
+
+        <div class="field-row">
+          <label>性別</label>
+          <div class="segmented">
+            <button type="button" class="segment-btn active" id="btn-female" onclick="setSex('female')">女性</button>
+            <button type="button" class="segment-btn" id="btn-male" onclick="setSex('male')">男性</button>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>年齢</label>
+          <div class="input-wrap">
+            <input type="number" id="age" value="35" oninput="calculate()">
+            <span class="unit">歳</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>身長</label>
+          <div class="input-wrap">
+            <input type="number" id="height" value="160" oninput="calculate()">
+            <span class="unit">cm</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>現在の体重</label>
+          <div class="input-wrap">
+            <input type="number" id="weight" value="60" step="0.1" oninput="calculate()">
+            <span class="unit">kg</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>目標体重</label>
+          <div class="input-wrap">
+            <input type="number" id="targetWeight" value="57" step="0.1" oninput="calculate()">
+            <span class="unit">kg</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>期間</label>
+          <div class="input-wrap">
+            <input type="number" id="months" value="3" step="0.5" oninput="calculate()">
+            <span class="unit">ヶ月</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>活動レベル</label>
+          <select id="activity" onchange="calculate()">
+            <option value="1.2">ほとんど運動しない</option>
+            <option value="1.375" selected>週1-2回 軽い運動</option>
+            <option value="1.55">週3-4回 中程度の運動</option>
+            <option value="1.725">週5-6回 活発な運動</option>
+            <option value="1.9">毎日激しい運動・体力労働</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Result</h2>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <p class="stat-label">基礎代謝 BMR</p>
+            <p class="stat-value"><span id="bmr">-</span> <span class="stat-unit">kcal</span></p>
+          </div>
+          <div class="stat-box">
+            <p class="stat-label">消費カロリー TDEE</p>
+            <p class="stat-value"><span id="tdee">-</span> <span class="stat-unit">kcal</span></p>
+          </div>
+        </div>
+
+        <div class="level-badge" id="levelBadge">-</div>
+        <p class="level-desc" id="levelDesc">-</p>
+
+        <div class="divider"></div>
+
+        <div class="big-stat">
+          <p class="big-stat-label">目標摂取カロリー</p>
+          <p class="big-stat-value"><span id="targetCalorie">-</span><span class="stat-unit"> kcal/日</span></p>
+          <p class="big-stat-sub" id="bigStatSub">-</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="exercise-section">
+          <p class="big-stat-label" style="color:#8A7A65;">カロリーを減らさず、運動だけで同じ差を作る場合</p>
+          <p class="exercise-intro" id="exerciseIntro">-</p>
+
+          <div class="exercise-grid">
+            <div class="exercise-box">
+              <p class="exercise-label">🚶 速歩・有酸素</p>
+              <p class="exercise-value"><span id="walkMinutes">-</span><span class="stat-unit"> 分/日</span></p>
+            </div>
+            <div class="exercise-box">
+              <p class="exercise-label">🏃 ジョギング</p>
+              <p class="exercise-value"><span id="jogMinutes">-</span><span class="stat-unit"> 分/日</span></p>
+            </div>
+            <div class="exercise-box">
+              <p class="exercise-label">⚡ HIIT</p>
+              <p class="exercise-value"><span id="hiitSessions">-</span><span class="stat-unit"> 回/週</span></p>
+            </div>
+          </div>
+
+          <p class="exercise-note">
+            ※運動による消費カロリーは体重や強度により変動するため、目安として参考にしてください。実際には食事改善と運動の組み合わせがおすすめです。
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <p>※基礎代謝はMifflin-St Jeor式、体脂肪1kgあたり約7,200kcalとして計算しています。あくまで目安であり、個人差があります。</p>
+    </footer>
+  </div>
+</div>
+
+<script>
+  const KCAL_PER_KG = 7200;
+  let sex = 'female';
+
+  function setSex(value) {
+    sex = value;
+    document.getElementById('btn-female').classList.toggle('active', value === 'female');
+    document.getElementById('btn-male').classList.toggle('active', value === 'male');
+    calculate();
+  }
+
+  function calcBMR(sex, weight, height, age) {
+    const base = 10 * weight + 6.25 * height - 5 * age;
+    return sex === 'male' ? base + 5 : base - 161;
+  }
+
+  function judgeLevel(deficitRatio) {
+    if (deficitRatio <= 0) {
+      return { label: '現状維持/増量', color: '#A0A0A0', desc: 'この設定では体重が増える方向のペースです。' };
+    }
+    if (deficitRatio <= 0.20) {
+      return { label: '無理なく達成可能', color: '#B89A8C', desc: '一般的に推奨される範囲内で、食事改善だけで十分に到達できるペースです。' };
+    }
+    if (deficitRatio <= 0.30) {
+      return { label: 'やや挑戦的', color: '#D4A373', desc: '達成は可能ですが、食事管理に加えて運動も組み合わせるとより無理なく進められます。' };
+    }
+    return { label: '高負荷(要注意)', color: '#C9836A', desc: 'この期間・体重差は、健康的なペースの目安(週あたり体重の0.5-1%程度)を超える可能性があります。期間を延ばすか目標を見直すことをおすすめします。' };
+  }
+
+  function calculate() {
+    const age = Number(document.getElementById('age').value) || 0;
+    const height = Number(document.getElementById('height').value) || 0;
+    const weight = Number(document.getElementById('weight').value) || 0;
+    const targetWeight = Number(document.getElementById('targetWeight').value) || 0;
+    const months = Number(document.getElementById('months').value) || 0;
+    const activity = Number(document.getElementById('activity').value) || 1.2;
+
+    const bmr = calcBMR(sex, weight, height, age);
+    const tdee = bmr * activity;
+
+    const diffKg = weight - targetWeight;
+    const days = months * 30;
+    const totalKcalNeeded = diffKg * KCAL_PER_KG;
+    const dailyDeficit = days > 0 ? totalKcalNeeded / days : 0;
+    const targetCalorie = tdee - dailyDeficit;
+
+    const deficitRatio = tdee > 0 ? dailyDeficit / tdee : 0;
+    const level = judgeLevel(deficitRatio);
+
+    const walkKcalPerMin = (weight * 5) / 60;
+    const jogKcalPerMin = (weight * 8.5) / 60;
+    const hiitKcalPerSession = weight * 6;
+
+    const walkMinutes = dailyDeficit > 0 ? dailyDeficit / walkKcalPerMin : 0;
+    const jogMinutes = dailyDeficit > 0 ? dailyDeficit / jogKcalPerMin : 0;
+    const hiitSessionsPerWeek = dailyDeficit > 0 ? (dailyDeficit * 7) / hiitKcalPerSession : 0;
+
+    document.getElementById('bmr').textContent = Math.round(bmr);
+    document.getElementById('tdee').textContent = Math.round(tdee);
+
+    const badge = document.getElementById('levelBadge');
+    badge.textContent = level.label;
+    badge.style.backgroundColor = level.color;
+    document.getElementById('levelDesc').textContent = level.desc;
+
+    document.getElementById('targetCalorie').textContent = targetCalorie > 0 ? Math.round(targetCalorie) : '—';
+
+    let subText = '';
+    if (diffKg > 0) {
+      subText = `${diffKg.toFixed(1)}kg を ${months}ヶ月で減らす場合、1日あたり約${Math.round(dailyDeficit)}kcalの不足が必要です。`;
+    } else if (diffKg < 0) {
+      subText = '目標体重が現在の体重より大きいため、増量プランとして計算されます。';
+    } else {
+      subText = '現在の体重と目標体重が同じです。';
+    }
+    document.getElementById('bigStatSub').textContent = subText;
+
+    document.getElementById('exerciseIntro').textContent =
+      `食事は今のTDEE(${Math.round(tdee)}kcal)のままにして、1日あたり約${Math.round(dailyDeficit)}kcalを運動で消費する場合の目安です。`;
+
+    document.getElementById('walkMinutes').textContent = walkMinutes > 0 ? Math.round(walkMinutes) : '—';
+    document.getElementById('jogMinutes').textContent = jogMinutes > 0 ? Math.round(jogMinutes) : '—';
+    document.getElementById('hiitSessions').textContent = hiitSessionsPerWeek > 0 ? Math.round(hiitSessionsPerWeek * 10) / 10 : '—';
+  }
+
+  calculate();
+</script>
+</body>
+</html>
