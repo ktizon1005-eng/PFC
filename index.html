@@ -338,6 +338,43 @@
     line-height: 1.8;
     margin: 0;
   }
+  .pfc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .pfc-box {
+    border-radius: 2px;
+    padding: 18px 12px;
+    text-align: center;
+    border: 1px solid #EBD9D3;
+  }
+  .pfc-box.protein { border-top: 3px solid #C9836A; }
+  .pfc-box.fat     { border-top: 3px solid #D4A373; }
+  .pfc-box.carb    { border-top: 3px solid #B89A8C; }
+  .pfc-name {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #A78E89;
+    letter-spacing: 0.2em;
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+  }
+  .pfc-ratio {
+    font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
+    font-size: 11px;
+    color: #CBB5B0;
+    margin: 0 0 8px 0;
+  }
+  .pfc-value {
+    font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #3A2E2C;
+    margin: 0;
+  }
   .footer {
     font-family: "Helvetica Neue", "Hiragino Sans", sans-serif;
     margin-top: 32px;
@@ -468,6 +505,29 @@
           <p class="big-stat-sub" id="bigStatSub">-</p>
         </div>
 
+        <div class="divider"></div>
+
+        <div id="pfcSection">
+          <p class="big-stat-label">PFC バランス（目標摂取カロリーより）</p>
+          <div class="pfc-grid">
+            <div class="pfc-box protein">
+              <p class="pfc-name">Protein</p>
+              <p class="pfc-ratio">30%</p>
+              <p class="pfc-value"><span id="pfcP">-</span><span class="stat-unit"> g</span></p>
+            </div>
+            <div class="pfc-box fat">
+              <p class="pfc-name">Fat</p>
+              <p class="pfc-ratio">25%</p>
+              <p class="pfc-value"><span id="pfcF">-</span><span class="stat-unit"> g</span></p>
+            </div>
+            <div class="pfc-box carb">
+              <p class="pfc-name">Carb</p>
+              <p class="pfc-ratio">45%</p>
+              <p class="pfc-value"><span id="pfcC">-</span><span class="stat-unit"> g</span></p>
+            </div>
+          </div>
+        </div>
+
         <div class="warning-box" id="warningBox">
           ⚠️ 目標摂取カロリーが推奨最低値（女性: 1,200 kcal・男性: 1,500 kcal）を下回っています。このペースは健康リスクを伴う可能性があります。期間を延ばすか、目標体重を見直すことをおすすめします。心配な場合は医師や管理栄養士にご相談ください。
         </div>
@@ -573,6 +633,16 @@
     document.getElementById('levelDesc').textContent = level.desc;
 
     document.getElementById('targetCalorie').textContent = targetCalorie > 0 ? Math.round(targetCalorie) : '—';
+
+    const pfcSection = document.getElementById('pfcSection');
+    if (targetCalorie > 0 && diffKg >= 0) {
+      pfcSection.style.display = '';
+      document.getElementById('pfcP').textContent = Math.round(targetCalorie * 0.30 / 4);
+      document.getElementById('pfcF').textContent = Math.round(targetCalorie * 0.25 / 9);
+      document.getElementById('pfcC').textContent = Math.round(targetCalorie * 0.45 / 4);
+    } else {
+      pfcSection.style.display = 'none';
+    }
 
     const minSafeCalorie = sex === 'female' ? 1200 : 1500;
     const showWarning = diffKg > 0 && targetCalorie < minSafeCalorie;
